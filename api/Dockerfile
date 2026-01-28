@@ -32,5 +32,14 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \
   CMD wget -qO- http://localhost:8080/actuator/health || exit 1
 
-# Run application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run application with memory limits for free tier (512MB total)
+# -Xmx400m: Max heap 400MB (leaves ~100MB for metaspace/threads)
+# -XX:+UseSerialGC: Lightweight GC for low memory
+# -Dserver.address=0.0.0.0: Bind to all interfaces (required by Render)
+ENTRYPOINT ["java", \
+  "-Xmx400m", \
+  "-XX:+UseSerialGC", \
+  "-XX:MaxMetaspaceSize=100m", \
+  "-Dserver.address=0.0.0.0", \
+  "-jar", \
+  "app.jar"]
