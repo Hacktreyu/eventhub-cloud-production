@@ -76,9 +76,11 @@ services:
     container_name: eventhub-api
     environment:
       SPRING_PROFILES_ACTIVE: local
-      DATABASE_URL: jdbc:postgresql://postgres:5432/eventhub
-      DATABASE_USER: eventhub
-      DATABASE_PASSWORD: eventhub123
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: eventhub
+      DB_USER: eventhub
+      DB_PASSWORD: eventhub123
       KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
       KAFKA_ENABLED: "true"
     ports:
