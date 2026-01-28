@@ -1,0 +1,123 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: eventhub-api
+  
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:eventhub}
+    username: ${DB_USER:eventhub}
+    password: ${DB_PASSWORD:eventhub123}
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: eventhub-consumer-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
+# Custom app config
+app:
+  kafka:
+    enabled: ${KAFKA_ENABLED:true}
+    topic:
+      events: events
+
+# OpenAPI
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: EventHub API
+    description: Event-Driven Cloud Application
+    version: 1.0.0
+
+logging:
+  level:
+    root: INFO
+    com.eventhub: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+---
+# Profile: local (development with Kafka)
+spring:
+  config:
+    activate:
+      on-profile: local
+
+app:
+  kafka:
+    enabled: true
+
+---
+# Profile: demo (production without Kafka - in-memory mode)
+spring:
+  config:
+    activate:
+      on-profile: demo
+
+app:
+  kafka:
+    enabled: false
+
+    com.eventhub: INFO
+
+---
+# Profile: prod (Cloud deployment with external Kafka)
+spring:
+  config:
+    activate:
+      on-profile: prod
+  
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    properties:
+      security.protocol: SASL_SSL
+      sasl.mechanism: SCRAM-SHA-256
+      sasl.jaas.config: org.apache.kafka.common.security.scram.ScramLoginModule required username="${KAFKA_USERNAME}" password="${KAFKA_PASSWORD}";
+    producer:
+      properties:
+        enable.idempotence: false
+
+app:
+  kafka:
+    enabled: true

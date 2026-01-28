@@ -1,0 +1,55 @@
+services:
+  # Backend - Spring Boot API (Free Tier: se duerme tras 15 min de inactividad)
+  - type: web
+    name: eventhub-api
+    runtime: docker
+    env: docker
+    rootDir: api
+    dockerfilePath: Dockerfile
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: SPRING_PROFILES_ACTIVE
+        value: demo
+      - key: DB_HOST
+        fromDatabase:
+          name: eventhub-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: eventhub-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: eventhub-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: eventhub-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: eventhub-db
+          property: password
+
+  # Frontend - React/Vite Static Site
+  - type: web
+    name: eventhub-app
+    env: static
+    rootDir: app
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+databases:
+  - name: eventhub-db
+    databaseName: eventhub
+    user: eventhub
+    plan: free
