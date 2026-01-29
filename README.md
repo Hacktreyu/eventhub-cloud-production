@@ -288,4 +288,11 @@ cd api
 
 ## Licencia
 
-MIT - Usar libremente como template.
+MIT - Usar libremente como template.## Licencia
+
+MIT License
+
+Copyright (c) 2026 Atreyu Romero
+
+Se permite el uso, copia y modificación de este proyecto como plantilla, siempre que se mantenga esta nota de copyright.
+
