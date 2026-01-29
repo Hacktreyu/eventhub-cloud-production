@@ -7,7 +7,9 @@ import com.eventhub.api.entity.EventStatus;
 import com.eventhub.api.exception.EventNotFoundException;
 import com.eventhub.api.repository.EventRepository;
 import com.eventhub.api.service.EventPublisher;
+
 import com.eventhub.api.service.EventService;
+import com.eventhub.api.service.SseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,6 +39,9 @@ class EventServiceTest {
 
     @Mock
     private EventPublisher eventPublisher;
+
+    @Mock
+    private SseService sseService;
 
     @InjectMocks
     private EventService eventService;

@@ -4,7 +4,9 @@ import com.eventhub.api.controller.EventController;
 import com.eventhub.api.dto.CreateEventRequest;
 import com.eventhub.api.dto.EventResponse;
 import com.eventhub.api.entity.EventStatus;
+
 import com.eventhub.api.service.EventService;
+import com.eventhub.api.service.SseService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,6 +39,9 @@ class EventControllerTest {
 
     @MockBean
     private EventService eventService;
+
+    @MockBean
+    private SseService sseService;
 
     @Test
     @DisplayName("POST /api/events - Should create event")
