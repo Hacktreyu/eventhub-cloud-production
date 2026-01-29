@@ -15,7 +15,8 @@ public class SseService {
     private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
 
     public SseEmitter subscribe() {
-        // Timeout muy alto o infinito. 1 hora = 3600000L
+        // Timeout muy alto o infinito para mantener la conexión. Por defecto suele ser 30s.
+        // Aquí ponemos 1 hora (3600000L). El cliente debe reconectar si se pierde.
         SseEmitter emitter = new SseEmitter(3600000L); 
         
         emitter.onCompletion(() -> {
@@ -50,6 +51,7 @@ public class SseService {
                         .name(eventName)
                         .data(data));
             } catch (IOException e) {
+                log.debug("Error sending SSE to client, removing emitter");
                 deadEmitters.add(emitter);
             }
         });

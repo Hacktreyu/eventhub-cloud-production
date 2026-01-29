@@ -97,6 +97,7 @@ public class EventController {
         eventService.deleteAllEvents();
         return ResponseEntity.noContent().build();
     }
+
     @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "Suscribirse a eventos (SSE)")
     @ApiResponse(responseCode = "200", description = "Stream de eventos")
