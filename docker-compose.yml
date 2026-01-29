@@ -98,6 +98,20 @@ services:
     networks:
       - eventhub-network
 
+  # Frontend - React App
+  web:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: eventhub-web
+    ports:
+      - "3000:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - eventhub-network
+
 volumes:
   postgres_data:
   redpanda_data:
