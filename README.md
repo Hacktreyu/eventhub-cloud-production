@@ -83,7 +83,7 @@ En producción real usaría Kafka, pero para una demo o entorno de desarrollo si
 ### Opción 1: Todo con Docker
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/eventhub-cloud.git
+git clone https://github.com/Hacktreyu/eventhub-cloud-production.git
 cd eventhub-cloud
 
 # Levantar todo (Postgres, Kafka, API)
