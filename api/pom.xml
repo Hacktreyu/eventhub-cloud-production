@@ -55,11 +55,10 @@
             <scope>runtime</scope>
         </dependency>
         
-        <!-- H2 for testing -->
+        <!-- H2 for testing and demo mode -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>test</scope>
         </dependency>
         
         <!-- Spring Kafka -->
