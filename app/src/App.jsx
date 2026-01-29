@@ -87,7 +87,6 @@ function App() {
 
         eventSource.onerror = (error) => {
             console.error('SSE error:', error)
-            // EventSource intenta reconectar automáticamente, pero si es un error fatal podemos cerrarla
             if (eventSource.readyState === EventSource.CLOSED) {
                 setToast({ message: 'SSE connection lost. Reconnecting...', type: 'error' })
             }
