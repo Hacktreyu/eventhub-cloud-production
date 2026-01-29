@@ -56,6 +56,7 @@ function App() {
 
         eventSource.onopen = () => {
             console.log('SSE connection established')
+            setToast(null)
         }
 
         eventSource.addEventListener('event-created', (event) => {
