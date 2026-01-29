@@ -6,7 +6,7 @@ Sistema de eventos asíncronos con Spring Boot, PostgreSQL y React. Implementa u
 
 Permite crear eventos que se guardan en BD y se procesan de forma asíncrona. El usuario crea un evento vía API, este se persiste con estado `PENDING`, se publica en una cola (Kafka o in-memory según el modo), y un consumer lo procesa cambiando su estado a `PROCESSING` y luego a `PROCESSED` o `FAILED`.
 
-El frontend React se actualiza automáticamente cada pocos segundos para reflejar los cambios.
+El frontend React se conecta mediante **Server-Sent Events (SSE)** para recibir actualizaciones en tiempo real, eliminando la necesidad de recargar la página.
 
 ## Arquitectura
 
@@ -44,7 +44,7 @@ El frontend React se actualiza automáticamente cada pocos segundos para refleja
 │              │       INFRASTRUCTURE                                    │
 │              └─────────────────────────────────────────────────────────┘
 │                                                                         │
-└─────────────────────────────────────────────────────────────────────────┘
+└────────────────────────────────────SSE (Real-time)──────────────────────┘
 
 Flujo:
 1. Usuario crea evento via React UI
@@ -52,7 +52,7 @@ Flujo:
 3. Evento se publica al topic "events"
 4. Consumer recibe mensaje, lo procesa
 5. Consumer actualiza estado a PROCESSED
-6. Frontend hace polling cada 3 segundos y muestra el cambio
+6. Frontend recibe actualización en tiempo real vía SSE (sin recargar)
 ```
 
 ## Modos de ejecución
@@ -86,10 +86,11 @@ En producción real usaría Kafka, pero para una demo o entorno de desarrollo si
 git clone https://github.com/Hacktreyu/eventhub-cloud-production.git
 cd eventhub-cloud
 
-# Levantar todo (Postgres, Kafka, API)
-docker-compose up -d
+# Levantar todo (Postgres, Kafka, API, Frontend)
+docker-compose up --build
 
 # URLs:
+# Frontend: http://localhost:3000
 # API:      http://localhost:8080
 # Swagger:  http://localhost:8080/swagger-ui.html
 # Kafka UI: http://localhost:8090

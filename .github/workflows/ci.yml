@@ -14,20 +14,6 @@ jobs:
     name: Build and Test
     runs-on: ubuntu-latest
     
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_DB: eventhub_test
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     steps:
       - name: Checkout code
@@ -59,9 +45,6 @@ jobs:
         working-directory: ./api
         env:
           SPRING_PROFILES_ACTIVE: demo
-          DATABASE_URL: jdbc:postgresql://localhost:5432/eventhub_test
-          DATABASE_USER: test
-          DATABASE_PASSWORD: test
           KAFKA_ENABLED: "false"
         run: mvn test -B -Dtest=*IntegrationTest
 
