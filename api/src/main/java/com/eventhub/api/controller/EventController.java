@@ -14,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import com.eventhub.api.service.SseService;
+import org.springframework.http.MediaType;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +33,7 @@ import java.util.List;
 public class EventController {
 
     private final EventService eventService;
+    private final SseService sseService;
 
     @PostMapping
     @Operation(summary = "Crear evento", description = "Crea un evento, lo guarda en BD y lo publica en la cola")
@@ -92,5 +96,13 @@ public class EventController {
         log.info("DELETE /api/events - Deleting all events");
         eventService.deleteAllEvents();
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @Operation(summary = "Suscribirse a eventos (SSE)")
+    @ApiResponse(responseCode = "200", description = "Stream de eventos")
+    public SseEmitter subscribe() {
+        log.info("GET /api/events/subscribe - New SSE subscription");
+        return sseService.subscribe();
     }
 }

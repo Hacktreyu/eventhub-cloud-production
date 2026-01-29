@@ -18,7 +18,8 @@ import java.util.stream.Collectors;
 
 /**
  * Servicio principal para gestión de eventos.
- * Coordina la persistencia en BD y la publicación en la cola (Kafka o in-memory según config).
+ * Coordina la persistencia en BD y la publicación en la cola (Kafka o in-memory
+ * según config).
  */
 @Service
 @RequiredArgsConstructor
@@ -27,8 +28,10 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final EventPublisher eventPublisher;
+    private final SseService sseService;
 
-    // Primero guarda en BD, luego publica. Así aunque falle la cola, tenemos registro del evento.
+    // Primero guarda en BD, luego publica. Así aunque falle la cola, tenemos
+    // registro del evento.
     @Transactional
     public EventResponse createEvent(CreateEventRequest request) {
         log.info("Creating new event: title='{}', source='{}', type='{}'",
@@ -54,6 +57,7 @@ public class EventService {
         log.info("Event creation completed: id={}, kafkaEnabled={}",
                 savedEvent.getId(), eventPublisher.isKafkaEnabled());
 
+        sseService.notifyClients("event-created", response);
         return response;
     }
 
@@ -81,7 +85,8 @@ public class EventService {
                 .collect(Collectors.toList());
     }
 
-    // Solo el consumer debe llamar a esto. Actualiza el estado y marca processedAt si es PROCESSED.
+    // Solo el consumer debe llamar a esto. Actualiza el estado y marca processedAt
+    // si es PROCESSED.
     @Transactional
     public EventResponse updateEventStatus(Long eventId, EventStatus status) {
         log.info("Updating event status: id={}, newStatus={}", eventId, status);
@@ -98,6 +103,7 @@ public class EventService {
         Event updated = eventRepository.save(event);
         log.info("Event status updated: id={}, status={}", updated.getId(), updated.getStatus());
 
+        sseService.notifyClients("event-updated", EventResponse.fromEntity(updated));
         return EventResponse.fromEntity(updated);
     }
 
@@ -126,9 +132,11 @@ public class EventService {
         log.info("Deleting all events");
         eventRepository.deleteAll();
         log.info("All events deleted");
+        sseService.notifyClients("events-cleared", null);
     }
 
-    // Limpieza automática cada 5 horas para evitar que la demo acumule basura de pruebas
+    // Limpieza automática cada 5 horas para evitar que la demo acumule basura de
+    // pruebas
     @org.springframework.scheduling.annotation.Scheduled(fixedRate = 18000000) // 5h = 18_000_000ms
     @Transactional
     public void autoDeleteEvents() {

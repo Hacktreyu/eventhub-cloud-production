@@ -43,18 +43,60 @@ function App() {
         }
     }, [])
 
-    // Carga inicial y polling cada 3 segundos
+    // Carga inicial y suscripción a SSE
     useEffect(() => {
         setLoading(true)
         Promise.all([fetchEvents(), fetchStats()]).finally(() => setLoading(false))
 
-        // Polling cada 3 segundos
-        const interval = setInterval(() => {
-            fetchEvents()
-            fetchStats()
-        }, 3000)
+        // Suscribirse a Server-Sent Events
+        const sseUrl = `${API_BASE}/api/events/subscribe`
+        console.log('Connecting to SSE:', sseUrl)
 
-        return () => clearInterval(interval)
+        const eventSource = new EventSource(sseUrl)
+
+        eventSource.onopen = () => {
+            console.log('SSE connection established')
+        }
+
+        eventSource.addEventListener('event-created', (event) => {
+            try {
+                const newEvent = JSON.parse(event.data)
+                setEvents(prev => [newEvent, ...prev])
+                fetchStats()
+                showToast(`New event: ${newEvent.title}`, 'success')
+            } catch (error) {
+                console.error('Error parsing SSE event-created:', error)
+            }
+        })
+
+        eventSource.addEventListener('event-updated', (event) => {
+            try {
+                const updatedEvent = JSON.parse(event.data)
+                setEvents(prev => prev.map(evt => evt.id === updatedEvent.id ? updatedEvent : evt))
+                fetchStats()
+            } catch (error) {
+                console.error('Error parsing SSE event-updated:', error)
+            }
+        })
+
+        eventSource.addEventListener('events-cleared', () => {
+            setEvents([])
+            fetchStats()
+            showToast('Events cleared remotely', 'info')
+        })
+
+        eventSource.onerror = (error) => {
+            console.error('SSE error:', error)
+            // EventSource intenta reconectar automáticamente, pero si es un error fatal podemos cerrarla
+            if (eventSource.readyState === EventSource.CLOSED) {
+                setToast({ message: 'SSE connection lost. Reconnecting...', type: 'error' })
+            }
+        }
+
+        return () => {
+            console.log('Closing SSE connection')
+            eventSource.close()
+        }
     }, [fetchEvents, fetchStats])
 
     // Mostrar notificación toast
@@ -287,8 +329,8 @@ function App() {
                                     🗑️ Clear All
                                 </button>
                                 <span className="table-section__refresh">
-                                    {loading ? <span className="spinner" /> : '🔄'}
-                                    Auto-refresh: 3s
+                                    {loading ? <span className="spinner" /> : '⚡'}
+                                    Live Updates
                                 </span>
                             </span>
                         </div>
