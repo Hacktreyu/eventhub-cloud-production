@@ -103,8 +103,23 @@ jobs:
             -e KAFKA_ENABLED=false \
             -p 8080:8080 \
             eventhub-api:latest
-          sleep 30
-          curl -f http://localhost:8080/actuator/health || exit 1
+          
+          echo "Waiting for service to start..."
+          # Retry loop: check health every 5s for up to 60s
+          for i in {1..12}; do
+            if curl -s -f http://localhost:8080/actuator/health; then
+              echo "Service is healthy!"
+              exit 0
+            fi
+            echo "Waiting..."
+            sleep 5
+          done
+          
+          # If we get here, it failed
+          echo "Service failed to start in time. Showing logs:"
+          docker logs test-api
+          exit 1
+          
           docker stop test-api
 
   code-quality:

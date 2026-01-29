@@ -49,7 +49,7 @@ public class SseService {
             try {
                 emitter.send(SseEmitter.event()
                         .name(eventName)
-                        .data(data));
+                        .data(data != null ? data : ""));
             } catch (IOException e) {
                 log.debug("Error sending SSE to client, removing emitter");
                 deadEmitters.add(emitter);

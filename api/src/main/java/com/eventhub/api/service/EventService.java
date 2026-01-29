@@ -132,7 +132,7 @@ public class EventService {
         log.info("Deleting all events");
         eventRepository.deleteAll();
         log.info("All events deleted");
-        sseService.notifyClients("events-cleared", null);
+        sseService.notifyClients("events-cleared", "true");
     }
 
     // Limpieza automática cada 5 horas para evitar que la demo acumule basura de
