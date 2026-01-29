@@ -58,4 +58,27 @@ public class SseService {
 
         emitters.removeAll(deadEmitters);
     }
+
+    // Ping cada 15 segundos para mantener la conexión viva (Heartbeat)
+    // Esto evita que Render/Nginx corten la conexión por inactividad.
+    @org.springframework.scheduling.annotation.Scheduled(fixedRate = 15000)
+    public void sendHeartbeat() {
+        if (emitters.isEmpty()) return;
+        
+        List<SseEmitter> deadEmitters = new CopyOnWriteArrayList<>();
+        
+        emitters.forEach(emitter -> {
+            try {
+                emitter.send(SseEmitter.event()
+                        .name("ping")
+                        .data("keep-alive"));
+            } catch (IOException e) {
+                deadEmitters.add(emitter);
+            }
+        });
+        
+        if (!deadEmitters.isEmpty()) {
+            emitters.removeAll(deadEmitters);
+        }
+    }
 }
