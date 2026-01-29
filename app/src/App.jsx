@@ -342,7 +342,7 @@ function App() {
             <footer className="footer">
                 <p>
                     EventHub Cloud Demo —
-                    <a href="https://github.com/YOUR_USERNAME/eventhub-cloud" target="_blank" rel="noopener noreferrer">
+                    <a href="https://github.com/Hacktreyu/eventhub-cloud-production" target="_blank" rel="noopener noreferrer">
                         View on GitHub
                     </a>
                     {' '} | Built with Java Spring Boot + React
