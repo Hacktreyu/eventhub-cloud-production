@@ -9,6 +9,8 @@ function App() {
     const [loading, setLoading] = useState(false)
     const [submitting, setSubmitting] = useState(false)
     const [toast, setToast] = useState(null)
+    // Mostrar solo si NO estamos en localhost
+    const [showBanner, setShowBanner] = useState(!window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1'))
 
     const [formData, setFormData] = useState({
         title: '',
@@ -187,6 +189,25 @@ function App() {
 
     return (
         <>
+            {/* Deploy Warning Banner */}
+            {showBanner && (
+                <div className="deploy-banner">
+                    <div className="deploy-banner__content">
+                        <span className="deploy-banner__icon">⚠️</span>
+                        <span>
+                            <strong>Entorno Gratuito:</strong> El backend puede tardar hasta 1 minuto en iniciarse tras inactividad (Cold Start).
+                        </span>
+                        <button
+                            className="deploy-banner__close"
+                            onClick={() => setShowBanner(false)}
+                            aria-label="Cerrar aviso"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Header */}
             <header className="header">
                 <div className="header__logo">
