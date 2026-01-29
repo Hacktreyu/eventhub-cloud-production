@@ -27,6 +27,7 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final EventPublisher eventPublisher;
+    private final SseService sseService;
 
     // Primero guarda en BD, luego publica. Así aunque falle la cola, tenemos registro del evento.
     @Transactional
@@ -54,6 +55,7 @@ public class EventService {
         log.info("Event creation completed: id={}, kafkaEnabled={}",
                 savedEvent.getId(), eventPublisher.isKafkaEnabled());
 
+        sseService.notifyClients("event-created", response);
         return response;
     }
 
@@ -98,6 +100,7 @@ public class EventService {
         Event updated = eventRepository.save(event);
         log.info("Event status updated: id={}, status={}", updated.getId(), updated.getStatus());
 
+        sseService.notifyClients("event-updated", EventResponse.fromEntity(updated));
         return EventResponse.fromEntity(updated);
     }
 
@@ -126,6 +129,7 @@ public class EventService {
         log.info("Deleting all events");
         eventRepository.deleteAll();
         log.info("All events deleted");
+        sseService.notifyClients("events-cleared", null);
     }
 
     // Limpieza automática cada 5 horas para evitar que la demo acumule basura de pruebas
