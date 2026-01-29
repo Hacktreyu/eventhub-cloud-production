@@ -262,7 +262,7 @@ cd api
 
 | Variable | Default | Uso |
 |----------|---------|-----|
-| `VITE_API_URL` | `""` (vacío, usa proxy) | URL del backend |
+| `VITE_API_URL` | `""` (vacío, se pone manual) | URL del backend |
 
 ## Stack técnico
 
