@@ -195,7 +195,7 @@ function App() {
                     <div className="deploy-banner__content">
                         <span className="deploy-banner__icon">⚠️</span>
                         <span>
-                            <strong>Uso un entorno Gratuito:</strong> Por eso el backend puede tardar hasta 1 minuto en iniciarse (Cold Start).
+                            <strong>Uso un entorno Gratuito</strong> por eso el backend puede tardar hasta 1 minuto en iniciarse (Cold Start).
                         </span>
                         <button
                             className="deploy-banner__close"
